@@ -1,6 +1,14 @@
 import random
 
 
+class Persona:
+    def __init__(self, id, nombre, vida):
+        self.nombre = nombre
+        self.id = id
+        self.vida_maxima = vida
+        self.vida = self.vida_maxima
+
+
 class Traje:
     def __init__(self, color):
         self.color = color
@@ -9,25 +17,10 @@ class Traje:
         return f"color: {self.color}"
 
 
-# Composition: Los attributes del Guerrero son other object
-class Guerrero:
-    def __init__(self, color, id, vida):
+class Guerrero(Persona):
+    def __init__(self, id, nombre, vida, color):
+        super().__init__(id, nombre, vida)
         self.color = color
-        self.id = id
-        self.vida_maxima = vida
-        self.vida = self.vida_maxima
-
-    """
-    def herido(self, poder_ataque):
-        # Es herido
-        self.vida -= poder_ataque
-
-        if self.vida <= 0:
-            print(f"El guerrero {self.color} ha muerto")
-        else:
-            print(f"Vidas restantes del guerrero {self.color}: {self.vida}")
-
-    """
 
     def atacar(self, poder_ataque, victima):
         if victima.vida > 0 and victima.vida <= victima.vida_maxima:
@@ -43,28 +36,11 @@ class Guerrero:
             print(
                 f"Soy el Ranger {self.id}. Tenia {vida_anterior} vidas, y ahora tengo {self.vida}"
             )
-            # print(f" * Al  {self.color} aun le quedan {self.vida} vidas")
 
 
-class Enemigo:
-    def __init__(self, id, vida):
-        self.nombres = ["Enemigo 0", "Enemigo 1", "Enemigo 2", "Enemigo 3", "Enemigo 4"]
-        self.id = id
-        self.vida_maxima = vida
-        self.vida = self.vida_maxima
-        self.nombre = self.nombres[self.id]
-
-    """
-    def herido(self, poder_ataque):
-        # Es herido
-        self.vida -= poder_ataque
-
-        if self.vida <= 0:
-            print(f"El guerrero {self.color} ha muerto")
-        else:
-            print(f"Vidas restantes del guerrero {self.color}: {self.vida}")
-
-    """
+class Enemigo(Persona):
+    def __init__(self, id, nombre, vida):
+        super().__init__(id, nombre, vida)
 
     def atacar(self, poder_ataque, victima):
         if victima.vida > 0 and victima.vida <= victima.vida_maxima:
@@ -79,10 +55,7 @@ class Juego:
 
         self.crear_rangers()
         self.crear_enemigos()
-        # self.presentar()
         self.pelear()
-
-        # self.descansar()
 
     def crear_rangers(self):
         colores = [
@@ -92,21 +65,20 @@ class Juego:
             Traje("amarillo"),
             Traje("rosa"),
         ]
-
+        nombres = ["Juan", "Pepe", "Mario", "Pablo", "Lucio"]
         for i in range(5):
             color = colores.pop(0)
+            nombre = nombres.pop(0)
             vida = 3
-            self.rangers.append(Guerrero(color, i, vida))
-            # COLOR, ID, VIDA
-
+            self.rangers.append(Guerrero(i, nombre, vida, color))
         return self.rangers
 
     def crear_enemigos(self):
+        nombres = ["Enemigo 0", "Enemigo 1", "Enemigo 2", "Enemigo 3", "Enemigo 4"]
         vida = 3
-        # for i in range(len(self.rangers)):
         for i in range(5):
-            self.enemigos.append(Enemigo(i, vida))
-
+            nombre = nombres.pop(0)
+            self.enemigos.append(Enemigo(i, nombre, vida))
         return self.enemigos
 
     def pelear(self):
@@ -114,13 +86,6 @@ class Juego:
         for _ in range(numero_partidas):
 
             for ranger in self.rangers:
-                """
-                #ranger_que_ataca = self.rangers[ranger]
-                #ranger_que_ataca = self.rangers[random.randint(0, len(self.rangers) - 1)]
-                #ranger_atacado = self.enemigos[random.randint(1, len(self.enemigos) - 1) ]
-                #ranger_atacado = self.rangers[random.randint(0, len(self.rangers) - 1) ]
-                """
-                # Si el ranger està vivo:
                 if ranger.vida > 0:
                     # Elige un enemigo al azar
                     enemigo_objetivo = random.choice(self.enemigos)
@@ -130,21 +95,13 @@ class Juego:
                         ranger.atacar(1, enemigo_objetivo)
 
             for enemigo in self.enemigos:
-                """
-                #enemigo_que_ataca = self.enemigos[random.randint(0, len(self.enemigos) - 1)]
-                #enemigo_atacado = self.rangers[random.randint(1, len(self.rangers) - 1) ]
-                #enemigo_atacado = self.enemigos[random.randint(0, len(self.enemigos) - 1) ]
-                """
+
                 if enemigo.vida > 0:
                     ranger_objetivo = random.choice(self.rangers)
 
                     if ranger_objetivo.vida > 0:
                         enemigo.atacar(1, ranger_objetivo)
 
-            """
-            #ranger_que_ataca.atacar(1, enemigo_atacado)
-            #enemigo_que_ataca.atacar(1, ranger_atacado)
-            """
         print("Muertos")
         for ranger in self.rangers:
             if ranger.vida <= 0:
@@ -164,14 +121,6 @@ class Juego:
         print("ESTADO DE LOS ENEMIGOS DESPUES DE LA PELEA")
         for enemigo in self.enemigos:
             print(f"{enemigo.nombre} con {enemigo.vida} de vida")
-
-        # return self.rangers
-
-    """
-    def descansar(self):
-        for ranger in self.rangers:
-            ranger.descansar()
-    """
 
 
 if __name__ == "__main__":
