@@ -1,12 +1,17 @@
+from abc import ABC, abstractmethod
 import random
 
 
-class Persona:
+class Persona(ABC):
     def __init__(self, id, nombre, vida):
         self.nombre = nombre
         self.id = id
         self.vida_maxima = vida
         self.vida = self.vida_maxima
+
+    @abstractmethod
+    def atacar(self, poder_ataque, victima):
+        pass
 
 
 class Traje:
@@ -14,19 +19,21 @@ class Traje:
         self.color = color
 
     def __str__(self):
-        return f"color: {self.color}"
+        return f"color {self.color}"
 
 
 class Guerrero(Persona):
     def __init__(self, id, nombre, vida, color):
         super().__init__(id, nombre, vida)
-        self.color = color
+        self.traje = color
 
     def atacar(self, poder_ataque, victima):
         if victima.vida > 0 and victima.vida <= victima.vida_maxima:
-            victima.vida -= poder_ataque
-            print(f"Ranger {self.color} ataca a enemigo {victima.nombre}")
+            victima.vida = max(0, victima.vida - poder_ataque)
+            # Si el resultado de vida - ataque es mayor que 0 → lo asigna
+            # Si el resultado es menor que 0 → asigna 0 (nunca será negativo).
 
+    """
     def descansar(self):
         vida_anterior = self.vida  # Tomo el antiguo valor
         if self.vida > 0 and self.vida < self.vida_maxima:  # Vida maxima = 3
@@ -36,6 +43,7 @@ class Guerrero(Persona):
             print(
                 f"Soy el Ranger {self.id}. Tenia {vida_anterior} vidas, y ahora tengo {self.vida}"
             )
+    """
 
 
 class Enemigo(Persona):
@@ -44,8 +52,7 @@ class Enemigo(Persona):
 
     def atacar(self, poder_ataque, victima):
         if victima.vida > 0 and victima.vida <= victima.vida_maxima:
-            victima.vida -= poder_ataque
-            print(f"Enemigo {self.id} ataca a Ranger {victima.color}")
+            victima.vida = max(0, victima.vida - poder_ataque)
 
 
 class Juego:
@@ -56,6 +63,7 @@ class Juego:
         self.crear_rangers()
         self.crear_enemigos()
         self.pelear()
+        self.mostrar_estado()
 
     def crear_rangers(self):
         colores = [
@@ -65,7 +73,7 @@ class Juego:
             Traje("amarillo"),
             Traje("rosa"),
         ]
-        nombres = ["Juan", "Pepe", "Mario", "Pablo", "Lucio"]
+        nombres = ["ranger 1", "ranger 2", "ranger 3", "ranger 4", "ranger 5"]
         for i in range(5):
             color = colores.pop(0)
             nombre = nombres.pop(0)
@@ -82,7 +90,7 @@ class Juego:
         return self.enemigos
 
     def pelear(self):
-        numero_partidas = 1
+        numero_partidas = 10
         for _ in range(numero_partidas):
 
             for ranger in self.rangers:
@@ -102,10 +110,11 @@ class Juego:
                     if ranger_objetivo.vida > 0:
                         enemigo.atacar(1, ranger_objetivo)
 
+    def mostrar_estado(self):
         print("Muertos")
         for ranger in self.rangers:
             if ranger.vida <= 0:
-                print(f"El ranger {ranger.color} ha muerto")
+                print(f"El ranger {ranger.traje} ha muerto")
 
         for enemigo in self.enemigos:
             if enemigo.vida <= 0:
@@ -113,10 +122,9 @@ class Juego:
 
         # Mostrar Estado Después de fight
         print()
-        print()
         print("ESTADO DE LOS RANGERS DESPUES DE LA PELEA")
         for ranger in self.rangers:
-            print(f"Ranger {ranger.color} con {ranger.vida} de vida")
+            print(f"Ranger {ranger.traje} con {ranger.vida} de vida")
 
         print("ESTADO DE LOS ENEMIGOS DESPUES DE LA PELEA")
         for enemigo in self.enemigos:
